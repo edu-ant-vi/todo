@@ -20,41 +20,27 @@
     <https://www.gnu.org/licenses/>. 
 */
 
+// A cli todo app. Because creativity was never an option.
+
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "todo.h"
 
-void todo_init(Todo_list *td)
+
+void usage(const char *name);
+
+int main(int argc, char **argv)
 {
-    td->count = 0;
-    td->capacity = 8;
-    td->tasks = (Task*) calloc(sizeof(Task), 8);
+    if(argc != 1) usage(argv[0]);
+
+    // Actual program goes in here
+
+    return 0;
 }
 
-int todo_add(Todo_list *td, Task_state st, const char *name)
+void usage(const char *name)
 {
-    if(td->capacity < td->count + 1) {
-        td->capacity *= 2;
-        td->tasks = 
-            realloc(td->tasks, td->capacity * sizeof(Task));
-    }
-    Task t = { .state = st, .name = name };
-    td->tasks[td->count] = t;
-    return td->count++;
-}
-
-void todo_rm(Todo_list *td, int task_index)
-{
-    if(task_index < td->count - 1)
-        for(int i = td->count - 1; i > task_index; i--)
-            td->tasks[i - 1] = td->tasks[i];
-    td->count--;
-}
-
-void todo_free(Todo_list *td)
-{
-    free(td->tasks);
-    td->count = 0;
-    td->capacity = 0;
-    td->tasks = NULL;
+    fprintf(stderr, "usage: %s\n", name);
+    exit(1);
 }
