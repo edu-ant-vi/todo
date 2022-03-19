@@ -20,17 +20,21 @@
     <https://www.gnu.org/licenses/>. 
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "todo.h"
 
-void todo_init(Todo_list *td)
+// Initialize todo list
+void todo_init(Todo_list *td, const char *title)
 {
     td->count = 0;
     td->capacity = 8;
+    td->title = title;
     td->tasks = (Task*) calloc(sizeof(Task), 8);
 }
 
+// Add task to todo list and return its index on it
 int todo_add(Todo_list *td, Task_state st, const char *name)
 {
     if(td->capacity < td->count + 1) {
@@ -43,6 +47,7 @@ int todo_add(Todo_list *td, Task_state st, const char *name)
     return td->count++;
 }
 
+// Remove task from todo list by its index
 void todo_rm(Todo_list *td, int task_index)
 {
     if(task_index < td->count - 1)
@@ -51,10 +56,39 @@ void todo_rm(Todo_list *td, int task_index)
     td->count--;
 }
 
+// Free todo list
 void todo_free(Todo_list *td)
 {
     free(td->tasks);
     td->count = 0;
     td->capacity = 0;
     td->tasks = NULL;
+}
+
+// Print todo list in readable format
+void todo_print(Todo_list *td)
+{
+    printf("=== %s ===\n", td->title);
+
+    if(td->count == 0) {
+        printf("No tasks. Rejoice!\n");
+        return;
+    }
+
+    for(int i = 0; i < td->count; i++) {
+        switch(td->tasks[i].state) {
+            case TASK_TODO:
+                printf("[ ] ");
+                break;
+            case TASK_DONE:
+                printf("[✓] ");
+                break;
+            default:
+                // Should never happen
+                fprintf(stderr, "Unrecognized task state\n");
+                exit(16);
+        }
+        printf("%s\n", td->tasks[i].name);
+    }
+    printf("\n");
 }

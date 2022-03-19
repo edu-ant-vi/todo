@@ -24,9 +24,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "todo.h"
-
+#include "parse.h"
+#include "utils.h"
 
 void usage(const char *name);
 
@@ -34,8 +36,44 @@ int main(int argc, char **argv)
 {
     if(argc != 1) usage(argv[0]);
 
-    // Actual program goes in here
+    bool create = yorn("No todo list found. Create one?");
 
+    if(create) {
+
+        char title[256];
+        printf("Title: ");
+        get_line(title, 256);
+
+        Todo_list td;
+        todo_init(&td, title);
+        printf("Created empty todo list \"%s\"\n\n", title);
+
+        todo_print(&td);
+        printf("\nType h for help\n");
+
+        while(true) {
+            char command[256];
+            printf("> ");
+            get_line(command, 256);
+            Cm_type cm = parse(command);
+            switch(cm) {
+                case CM_HELP:
+                    printf("No help for u\n");
+                    break;
+                case CM_EXIT:
+                    printf("Ok, exiting...\n");
+                    return 0;
+                case CM_ERROR:
+                    fprintf(stderr, "U fucking typed it wrong\n");
+                    break;
+                default:
+                    fprintf(stderr, "I fucked up, sorry. Please try again\n");
+            }
+        }
+
+    }
+
+    printf("Ok, exiting...\n");
     return 0;
 }
 
