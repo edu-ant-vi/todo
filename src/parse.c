@@ -20,27 +20,95 @@
     <https://www.gnu.org/licenses/>. 
 */
 
+#include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "parse.h"
 
-static Cm_type parse_keyword(const char *text, int i, const char *rest, Cm_type ct)
+static Parser parser;
+
+static bool is_whitespace(char ch)
 {
-    if(text[i + 1] == '\0') return ct;
-    else if(strcmp(&text[i + 1], rest) == 0) return ct;
+    return ch == ' ' || ch == '\t';
+}
+
+static bool is_digit(char ch)
+{
+    return ch >= '0' && ch <= '9';
+}
+
+static char advance()
+{
+    return parser.text[parser.offset++];
+}
+
+static char peek()
+{
+    return parser.text[parser.offset];
+}
+
+static bool at_end()
+{
+    return parser.text[parser.offset] == '\0';
+}
+
+static const char *remaining_text()
+{
+    return &parser.text[parser.offset];
+}
+
+static Cm_type parse_keyword(const char *expected, Cm_type ct)
+{
+    if(is_whitespace(peek()) || at_end()) {
+        advance();
+        return ct;
+    }
+    else if(strncmp(remaining_text(), expected, strlen(expected)) == 0) {
+        for(unsigned long i = 0; i < strlen(expected); i++) advance();
+        advance();
+        return ct;
+    }
     else return CM_ERROR;
 }
 
-// Parse a string as a todo command
-Cm_type parse(const char *text)
+// Surprisingly, this works. It just needs some refactoring and polishment now.
+
+Command parse(const char *text)
 {
-    for(int i = 0; text[i] != '\0'; i++) {
-        switch(text[i]) {
-            case 'h': return parse_keyword(text, i, "elp", CM_HELP);
-            case 'e': return parse_keyword(text, i, "xit", CM_EXIT);
-            default:  return CM_ERROR;
-        }
+    parser.text = text;
+    parser.offset = 0;
+
+    Command cm;
+
+    while(is_whitespace(peek())) {
+        advance();
     }
 
-    return CM_ERROR;
+    switch(advance()) {
+        case 'h': cm.type = parse_keyword("elp", CM_HELP); break;
+        case 'q': cm.type = parse_keyword("uit", CM_QUIT); break;
+        default:  cm.type = CM_ERROR;
+    }
+
+    if(cm.type == CM_ERROR) {
+        strcpy(cm.arg.string, "Parsing error");
+        return cm;
+    }
+
+    char ch = advance();
+    if(ch == '"') {
+        int size;
+        for(size = 0; parser.text[parser.offset + size] != '"'; size++) {
+            if(at_end()) {
+                cm.type = CM_ERROR;
+                strcpy(cm.arg.string, "Unterminated string");
+            }
+        }
+        strncpy(cm.arg.string, remaining_text(), size - 1);
+    } else if(is_digit(ch)) {
+        cm.arg.number = strtoul(remaining_text(), NULL, 10);
+    }
+
+    return cm;
 }

@@ -25,11 +25,24 @@
 
 typedef enum {
     CM_HELP,
-    CM_EXIT,
+    CM_QUIT,
     CM_ERROR,
 } Cm_type;
 
+typedef struct {
+    Cm_type type;
+    union {
+        char string[256];
+        unsigned long number;
+    } arg;
+} Command;
+
+typedef struct {
+    const char *text;
+    int offset;
+} Parser;
+
 // Parse a string as a command
-Cm_type parse(const char *text);
+Command parse(const char *text);
 
 #endif // TODO_PARSE_H
