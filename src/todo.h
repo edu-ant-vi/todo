@@ -38,14 +38,13 @@ typedef struct {
 
 // Todo list = dynamic array of tasks
 typedef struct {
-    const char *title;
     int count;
     int capacity;
     Task *tasks;
 } Todo_list;
 
 // Initialize todo list
-void todo_init(Todo_list *td, const char *title);
+void todo_init(Todo_list *td);
 
 // Add task to todo list and return its index on it
 int todo_add(Todo_list *td, Task_state st, const char *name);

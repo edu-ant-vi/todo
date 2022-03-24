@@ -31,18 +31,8 @@ bool yorn(const char *prompt)
 {
     char ch;
     printf("%s [y/n] ", prompt);
-    fflush(stdin);
     ch = getchar();
-    // Remove trailing newline
-    getchar();
+    // Discard trailing input
+    while(getchar() != '\n');
     return ch == 'y';
 }
-
-// Get a line of input from stdin
-void get_line(char *buf, int buf_size)
-{
-    fgets(buf, buf_size, stdin);
-    // Remove trailing newline
-    buf[strcspn(buf, "\n")] = '\0';
-}
-

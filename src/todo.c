@@ -26,11 +26,10 @@
 #include "todo.h"
 
 // Initialize todo list
-void todo_init(Todo_list *td, const char *title)
+void todo_init(Todo_list *td)
 {
     td->count = 0;
     td->capacity = 8;
-    td->title = title;
     td->tasks = (Task*) calloc(sizeof(Task), 8);
 }
 
@@ -68,7 +67,7 @@ void todo_free(Todo_list *td)
 // Print todo list in readable format
 void todo_print(Todo_list *td)
 {
-    printf("=== %s ===\n", td->title);
+    printf("=== TODO ===\n");
 
     if(td->count == 0) {
         printf("No tasks. Rejoice!\n");

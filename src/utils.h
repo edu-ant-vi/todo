@@ -30,7 +30,4 @@
 // A yes-or-no prompt
 bool yorn(const char* prompt);
 
-// Get a line of input from stdin
-void get_line(char *buf, int buf_size);
-
 #endif // TODO_UTILS_H
