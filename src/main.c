@@ -24,31 +24,46 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
+#include <string.h>
 
 #include "todo.h"
-#include "utils.h"
 
 void usage(const char *name);
 
 int main(int argc, char **argv)
 {
-	if(argc != 1) usage(argv[0]);
+	const char todo_filename[] = "TODO";
 
-	bool create = yorn("No todo list found. Create one?");
+	Todo_list td;
+	todo_init(&td);
+	FILE *todo_file = fopen(todo_filename, "a+");
+	if(todo_file == NULL) {
+		fprintf(stderr, "Could not access or create todo file\n");
+		return 2;
+	}
+	todo_read_file(&td, todo_file);
 
-	if(create) {
-		Todo_list td;
-		todo_init(&td);
+	if(argc == 1) {
 		todo_print(&td);
+		todo_free(&td);
+		return 0;
 	}
 
-	printf("Ok, exiting...\n");
+	if(strcmp(argv[1], "add") == 0) {
+		for(int i = 2; argv[i] != NULL; i++) {
+			todo_add(&td, TASK_TODO, argv[i]);
+		}
+		todo_write_file(&td, todo_file);
+		todo_free(&td);
+		return 0;
+	}
+
+	todo_free(&td);
 	return 0;
 }
 
 void usage(const char *name)
 {
+	// TODO update usage text
 	fprintf(stderr, "usage: %s\n", name);
-	exit(1);
 }

@@ -18,6 +18,10 @@ DEPFILES := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.dat,$(SRCFILES))
 
 # Recipes:
 
+all: $(TARGET)
+
+reset: clean $(TARGET)
+
 $(TARGET): $(OBJFILES)
 	$(LINKER) $^ -o $@
 
@@ -33,4 +37,4 @@ clean:
 	$(RM) $(TARGET) $(OBJDIR)/*
 
 setup:
-	mkdir $(SRCDIR) $(OBJDIR)
+	mkdir $(OBJDIR)

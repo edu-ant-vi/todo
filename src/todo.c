@@ -20,8 +20,12 @@
     <https://www.gnu.org/licenses/>. 
 */
 
+// Necessary for strndup function
+#define _POSIX_C_SOURCE 200810L
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "todo.h"
 
@@ -30,18 +34,20 @@ void todo_init(Todo_list *td)
 {
     td->count = 0;
     td->capacity = 8;
-    td->tasks = (Task*) calloc(sizeof(Task), 8);
+    td->tasks = (Task*) calloc(8, sizeof(Task));
 }
 
 // Add task to todo list and return its index on it
-int todo_add(Todo_list *td, Task_state st, const char *name)
+int todo_add(Todo_list *td, Task_state ts, const char *name)
 {
     if(td->capacity < td->count + 1) {
         td->capacity *= 2;
         td->tasks = 
             realloc(td->tasks, td->capacity * sizeof(Task));
     }
-    Task t = { .state = st, .name = name };
+    Task t;
+    t.state = ts;
+    t.name = strndup(name, 256);
     td->tasks[td->count] = t;
     return td->count++;
 }
@@ -58,6 +64,9 @@ void todo_rm(Todo_list *td, int task_index)
 // Free todo list
 void todo_free(Todo_list *td)
 {
+    for(int i = 0; i < td->count; i++) {
+        free(td->tasks[td->count].name);
+    }
     free(td->tasks);
     td->count = 0;
     td->capacity = 0;
@@ -90,4 +99,42 @@ void todo_print(Todo_list *td)
         printf("%s\n", td->tasks[i].name);
     }
     printf("\n");
+}
+
+// Write todo list to file
+void todo_write_file(Todo_list *td, FILE *file)
+{
+    for(int i = 0; i < td->count; i++) {
+        switch(td->tasks[i].state) {
+            case TASK_TODO:
+                fprintf(file, "t,");
+                break;
+            case TASK_DONE:
+                fprintf(file, "d,");
+                break;
+            default:
+                fprintf(file, "?,");
+        }
+        fprintf(file, "%s\n", td->tasks[i].name);
+    }
+}
+
+// Read todo list from file
+void todo_read_file(Todo_list *td, FILE *file)
+{
+    int i;
+    Task_state ts;
+    char ch, name[256];
+    do {
+        i = fscanf(file, "%c,%[^\n]\n", &ch, name);
+        switch(ch) {
+            case 't': ts = TASK_TODO; break;
+            case 'd': ts = TASK_DONE; break;
+            default:
+                // Should never happen
+                fprintf(stderr, "Malformed TODO file!\n");
+                exit(33);
+        }
+        todo_add(td, ts, name);
+    } while(i != EOF);
 }
