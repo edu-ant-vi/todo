@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "todo.h"
@@ -125,8 +126,9 @@ void todo_read_file(Todo_list *td, FILE *file)
     int i;
     Task_state ts;
     char ch, name[256];
-    do {
+    while(true) {
         i = fscanf(file, "%c,%[^\n]\n", &ch, name);
+        if(i == EOF) return;
         switch(ch) {
             case 't': ts = TASK_TODO; break;
             case 'd': ts = TASK_DONE; break;
@@ -136,5 +138,5 @@ void todo_read_file(Todo_list *td, FILE *file)
                 exit(33);
         }
         todo_add(td, ts, name);
-    } while(i != EOF);
+    }
 }

@@ -18,7 +18,7 @@
    You should have received a copy of the GNU General
    Public License along with todo. If not, see
    <https://www.gnu.org/licenses/>.
-   */
+*/
 
 // A cli todo app. Because creativity was never an option.
 
