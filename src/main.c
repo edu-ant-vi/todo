@@ -36,12 +36,18 @@ int main(int argc, char **argv)
 
 	Todo_list td;
 	todo_init(&td);
-	FILE *todo_file = fopen(todo_filename, "a+");
+	FILE *todo_file = fopen(todo_filename, "r");
 	if(todo_file == NULL) {
-		fprintf(stderr, "Could not access or create todo file\n");
-		return 2;
+		// Arquivo certamente não existe
+		todo_file = fopen(todo_filename, "w");
+		if(todo_file == NULL) {
+			fprintf(stderr, "Could not access nor create file\n");
+			return 2;
+		}
+		fclose(todo_file);
+	} else {
+		todo_read_file(&td, todo_file);
 	}
-	todo_read_file(&td, todo_file);
 
 	if(argc == 1) {
 		todo_print(&td);
@@ -53,9 +59,14 @@ int main(int argc, char **argv)
 		for(int i = 2; argv[i] != NULL; i++) {
 			todo_add(&td, TASK_TODO, argv[i]);
 		}
+		todo_file = freopen(NULL, "w", todo_file);
 		todo_write_file(&td, todo_file);
 		todo_free(&td);
 		return 0;
+	} else {
+		fprintf(stderr, "Unrecognized command\n");
+		usage(argv[0]);
+		exit(1);
 	}
 
 	todo_free(&td);
