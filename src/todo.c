@@ -20,9 +20,6 @@
     <https://www.gnu.org/licenses/>. 
 */
 
-// Necessary for strndup function
-#define _POSIX_C_SOURCE 200810L
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +45,7 @@ unsigned todo_add(Todo_list *td, Task_state ts, const char *name)
     }
     Task t;
     t.state = ts;
-    t.name = strndup(name, 256);
+    strncpy(t.name, name, 256);
     td->tasks[td->count] = t;
     return td->count++;
 }
@@ -64,19 +61,16 @@ void todo_set_state(Todo_list *td, uint task_index, Task_state ts)
 void todo_rm(Todo_list *td, uint task_index)
 {
     if(task_index >= td->count) return;
-    free(td->tasks[task_index].name);
+    // memory leak when this isn't true
     if(task_index < td->count - 1)
-        for(uint i = td->count - 1; i > task_index; i--)
-            td->tasks[i - 1] = td->tasks[i];
+        for(uint i = task_index; i < td->count - 1; i++)
+            td->tasks[i] = td->tasks[i + 1];
     td->count--;
 }
 
 // Free todo list
 void todo_free(Todo_list *td)
 {
-    for(uint i = 0; i < td->count; i++) {
-        free(td->tasks[td->count].name);
-    }
     free(td->tasks);
     td->count = 0;
     td->capacity = 0;
@@ -118,10 +112,10 @@ void todo_write_file(Todo_list *td, FILE *file)
     for(uint i = 0; i < td->count; i++) {
         switch(td->tasks[i].state) {
             case TASK_TODO:
-                fprintf(file, "t,");
+                fprintf(file, "t");
                 break;
             case TASK_DONE:
-                fprintf(file, "d,");
+                fprintf(file, "d");
                 break;
             default:
                 fprintf(file, "?,");
@@ -137,7 +131,7 @@ void todo_read_file(Todo_list *td, FILE *file)
     Task_state ts;
     char ch, name[256];
     while(true) {
-        i = fscanf(file, "%c,%[^\n]\n", &ch, name);
+        i = fscanf(file, "%c%[^\n]\n", &ch, name);
         if(i == EOF) return;
         switch(ch) {
             case 't': ts = TASK_TODO; break;

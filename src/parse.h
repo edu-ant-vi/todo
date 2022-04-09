@@ -29,6 +29,7 @@ typedef enum {
     CM_NONE,
     CM_HELP,
     CM_ADD,
+    CM_REMOVE,
     CM_CHECK,
 
     CM_ERROR,

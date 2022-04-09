@@ -18,7 +18,7 @@
    You should have received a copy of the GNU General
    Public License along with todo. If not, see
    <https://www.gnu.org/licenses/>.
-*/
+   */
 
 // A cli todo app. Because creativity was never an option.
 
@@ -29,14 +29,14 @@
 #include "todo.h"
 #include "parse.h"
 
-// Exit, but close file streams and free allocated values
-// first, as a true gentleman does
+// Exit like a gentleman
 #define politely_exit(code) \
 	todo_free(&td);         \
 	fclose(todo_file);      \
 	exit(code);
 
 void usage(const char *name);
+void todo_save(Todo_list *td, FILE *todo_file);
 
 int main(int argc, char **argv)
 {
@@ -77,17 +77,34 @@ int main(int argc, char **argv)
 			for(int i = 2; argv[i] != NULL; i++) {
 				todo_add(&td, TASK_TODO, argv[i]);
 			}
-			todo_file = freopen(NULL, "w", todo_file);
-			if(todo_file == NULL) {
-				eprintf("Could not save changes to the TODO file\n"
-						"Perhaps you don't have write permissions on it?\n");
-				politely_exit(1);
+			todo_save(&td, todo_file);
+			politely_exit(0);
+		case CM_REMOVE:
+			// rm command: iterates over its arguments, using them as
+			// indexes for tasks to remove.
+			for(int i = 2; argv[i] != NULL; i++) {
+				int n;
+				int index;
+				n = sscanf(argv[i], "%d", &index);
+				if(n == EOF) {
+					eprintf("Arguments to rm must be numeric\n");
+					politely_exit(65);
+				}
+				if(index <= 0) {
+					eprintf("Task indexes start from 1\n");
+					politely_exit(65);
+				}
+				if((uint) index > td.count) {
+					eprintf("The maximum task index at the moment is %d\n", td.count - 1);
+					politely_exit(65);
+				}
+				todo_rm(&td, index - 1);
 			}
-			todo_write_file(&td, todo_file);
+			todo_save(&td, todo_file);
 			politely_exit(0);
 		case CM_CHECK:
-			// check command: iterates over its arguments, using as
-			// indexes for tasks to mark as done.
+			// check command: iterates over its arguments, using them
+			// as indexes for tasks to mark as done.
 			for(int i = 2; argv[i] != NULL; i++) {
 				int n;
 				int index;
@@ -106,13 +123,7 @@ int main(int argc, char **argv)
 				}
 				todo_set_state(&td, index - 1, TASK_DONE);
 			}
-			todo_file = freopen(NULL, "w", todo_file);
-			if(todo_file == NULL) {
-				eprintf("Could not save changes to the TODO file\n"
-						"Perhaps you don't have write permissions on it?\n");
-				politely_exit(1);
-			}
-			todo_write_file(&td, todo_file);
+			todo_save(&td, todo_file);
 			politely_exit(0);
 		case CM_ERROR:
 			// Stupid user error
@@ -125,7 +136,20 @@ int main(int argc, char **argv)
 			politely_exit(1024);
 	}
 
+	todo_save(&td, todo_file);
 	politely_exit(0);
+}
+
+void todo_save(Todo_list *td, FILE *todo_file)
+{
+	todo_file = freopen(NULL, "w", todo_file);
+	if(todo_file == NULL) {
+		eprintf("Could not save changes to the TODO file\n"
+				"Perhaps you don't have write permissions on it?\n");
+		todo_free(td);
+		exit(1);
+	}
+	todo_write_file(td, todo_file);
 }
 
 // Prints usage text
@@ -136,6 +160,7 @@ void usage(const char *name)
 		"List of commands:\n\n"
 		"help:  prints this usage text and exits\n"
 		"add:   adds new tasks to the todo list\n"
+		"rm:    removes tasks from the todo list\n"
 		"check: marks tasks as done\n"
 		"\nIf no command is given, the todo list is printed to stdout.\n";
 	eprintf(usage_text, name);

@@ -61,6 +61,7 @@ Command parse_command(const char *argv1)
     if(arg == NULL)            return CM_NONE;
     if(check_command("help"))  return CM_HELP;
     if(check_command("add"))   return CM_ADD;
+    if(check_command("rm"))    return CM_REMOVE;
     if(check_command("check")) return CM_CHECK;
 
     return CM_ERROR;

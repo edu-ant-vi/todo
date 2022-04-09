@@ -37,7 +37,7 @@ typedef enum {
 
 typedef struct {
     Task_state state;
-    char *name;
+    char name[256];
 } Task;
 
 // Todo list = dynamic array of tasks
