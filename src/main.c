@@ -24,14 +24,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "common.h"
 #include "todo.h"
 #include "parse.h"
-
-// Print to stderr
-#define eprintf(...) \
-	fprintf(stderr, __VA_ARGS__);
 
 // Exit, but close file streams and free allocated values
 // first, as a true gentleman does
@@ -52,7 +48,7 @@ int main(int argc, char **argv)
 	FILE *todo_file = fopen(todo_filename, "r");
 
 	if(todo_file != NULL) {
-		// If the file exists, we read
+		// If the file exists, we read it
 		todo_read_file(&td, todo_file);
 	} else {
 		// Otherwise, we attempt to create it
@@ -82,11 +78,45 @@ int main(int argc, char **argv)
 				todo_add(&td, TASK_TODO, argv[i]);
 			}
 			todo_file = freopen(NULL, "w", todo_file);
+			if(todo_file == NULL) {
+				eprintf("Could not save changes to the TODO file\n"
+						"Perhaps you don't have write permissions on it?\n");
+				politely_exit(1);
+			}
+			todo_write_file(&td, todo_file);
+			politely_exit(0);
+		case CM_CHECK:
+			// check command: iterates over its arguments, using as
+			// indexes for tasks to mark as done.
+			for(int i = 2; argv[i] != NULL; i++) {
+				int n;
+				int index;
+				n = sscanf(argv[i], "%d", &index);
+				if(n == EOF) {
+					eprintf("Arguments to check must be numeric\n");
+					politely_exit(65);
+				}
+				if(index <= 0) {
+					eprintf("Task indexes start from 1\n");
+					politely_exit(65);
+				}
+				if((uint) index > td.count) {
+					eprintf("The maximum task index at the moment is %d\n", td.count - 1);
+					politely_exit(65);
+				}
+				todo_set_state(&td, index - 1, TASK_DONE);
+			}
+			todo_file = freopen(NULL, "w", todo_file);
+			if(todo_file == NULL) {
+				eprintf("Could not save changes to the TODO file\n"
+						"Perhaps you don't have write permissions on it?\n");
+				politely_exit(1);
+			}
 			todo_write_file(&td, todo_file);
 			politely_exit(0);
 		case CM_ERROR:
-			// CLI error
-			eprintf("Unrecognized command!\n\n");
+			// Stupid user error
+			eprintf("Unrecognized command\n\n");
 			usage(argv[0]);
 			politely_exit(64);
 		default:
@@ -104,8 +134,9 @@ void usage(const char *name)
 	const char usage_text[] = 
 		"usage: %s <command>\n\n"
 		"List of commands:\n\n"
-		"help: prints this usage text and exits\n"
-		"add:  adds a new task to the todo list\n"
+		"help:  prints this usage text and exits\n"
+		"add:   adds new tasks to the todo list\n"
+		"check: marks tasks as done\n"
 		"\nIf no command is given, the todo list is printed to stdout.\n";
 	eprintf(usage_text, name);
 }

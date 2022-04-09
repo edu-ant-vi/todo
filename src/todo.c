@@ -25,9 +25,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 
+#include "common.h"
 #include "todo.h"
 
 // Initialize todo list
@@ -39,7 +39,7 @@ void todo_init(Todo_list *td)
 }
 
 // Add task to todo list and return its index on it
-int todo_add(Todo_list *td, Task_state ts, const char *name)
+unsigned todo_add(Todo_list *td, Task_state ts, const char *name)
 {
     if(td->capacity < td->count + 1) {
         td->capacity *= 2;
@@ -53,11 +53,20 @@ int todo_add(Todo_list *td, Task_state ts, const char *name)
     return td->count++;
 }
 
-// Remove task from todo list by its index
-void todo_rm(Todo_list *td, int task_index)
+// Set the state of a task by its index
+void todo_set_state(Todo_list *td, uint task_index, Task_state ts)
 {
+    if(task_index >= td->count) return;
+    td->tasks[task_index].state = ts;
+}
+
+// Remove task from todo list by its index
+void todo_rm(Todo_list *td, uint task_index)
+{
+    if(task_index >= td->count) return;
+    free(td->tasks[task_index].name);
     if(task_index < td->count - 1)
-        for(int i = td->count - 1; i > task_index; i--)
+        for(uint i = td->count - 1; i > task_index; i--)
             td->tasks[i - 1] = td->tasks[i];
     td->count--;
 }
@@ -65,7 +74,7 @@ void todo_rm(Todo_list *td, int task_index)
 // Free todo list
 void todo_free(Todo_list *td)
 {
-    for(int i = 0; i < td->count; i++) {
+    for(uint i = 0; i < td->count; i++) {
         free(td->tasks[td->count].name);
     }
     free(td->tasks);
@@ -84,7 +93,8 @@ void todo_print(Todo_list *td)
         return;
     }
 
-    for(int i = 0; i < td->count; i++) {
+    for(uint i = 0; i < td->count; i++) {
+        printf(" %d ", i + 1);
         switch(td->tasks[i].state) {
             case TASK_TODO:
                 printf("[ ] ");
@@ -105,7 +115,7 @@ void todo_print(Todo_list *td)
 // Write todo list to file
 void todo_write_file(Todo_list *td, FILE *file)
 {
-    for(int i = 0; i < td->count; i++) {
+    for(uint i = 0; i < td->count; i++) {
         switch(td->tasks[i].state) {
             case TASK_TODO:
                 fprintf(file, "t,");

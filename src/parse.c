@@ -20,9 +20,9 @@
    <https://www.gnu.org/licenses/>.
 */
 
-#include <stdbool.h>
 #include <string.h>
 
+#include "common.h"
 #include "parse.h"
 
 static const char *arg;
@@ -30,6 +30,7 @@ static const char *arg;
 // Check if arg is a short command starting with `ch`
 static bool check_short(char ch)
 {
+    // Don't this right now, but I might eventually
     return arg[0] == ch && arg[1] == '\0';
 }
 
@@ -57,9 +58,10 @@ Command parse_command(const char *argv1)
 {
     arg = argv1;
 
-    if(arg == NULL)           return CM_NONE;
-    if(check_command("help")) return CM_HELP;
-    if(check_command("add"))  return CM_ADD;
+    if(arg == NULL)            return CM_NONE;
+    if(check_command("help"))  return CM_HELP;
+    if(check_command("add"))   return CM_ADD;
+    if(check_command("check")) return CM_CHECK;
 
     return CM_ERROR;
 }

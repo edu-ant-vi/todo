@@ -20,21 +20,14 @@
    <https://www.gnu.org/licenses/>.
 */
 
-// CLI parsing module for todo.
+#ifndef TODO_COMMON_H
+#define TODO_COMMON_H
 
-#ifndef TODO_PARSE_H
-#define TODO_PARSE_H
+#include <stdbool.h>
 
-typedef enum {
-    CM_NONE,
-    CM_HELP,
-    CM_ADD,
-    CM_CHECK,
+typedef unsigned uint;
 
-    CM_ERROR,
-} Command;
+#define eprintf(...) \
+	fprintf(stderr, __VA_ARGS__);
 
-// Does what it promises
-Command parse_command(const char *argv1);
-
-#endif // TODO_PARSE_H
+#endif // TODO_COMMON_H

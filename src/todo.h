@@ -28,6 +28,8 @@
 
 #include <stdio.h>
 
+#include "common.h"
+
 typedef enum {
     TASK_TODO,
     TASK_DONE,
@@ -40,8 +42,8 @@ typedef struct {
 
 // Todo list = dynamic array of tasks
 typedef struct {
-    int count;
-    int capacity;
+    uint count;
+    uint capacity;
     Task *tasks;
 } Todo_list;
 
@@ -49,10 +51,13 @@ typedef struct {
 void todo_init(Todo_list *td);
 
 // Add task to todo list and return its index on it
-int todo_add(Todo_list *td, Task_state ts, const char *name);
+unsigned todo_add(Todo_list *td, Task_state ts, const char *name);
+
+// Set the state of a task by its index
+void todo_set_state(Todo_list *td, uint task_index, Task_state ts);
 
 // Remove task from todo list by its index
-void todo_rm(Todo_list *td, int task_index);
+void todo_rm(Todo_list *td, uint task_index);
 
 // Free todo list
 void todo_free(Todo_list *td);
