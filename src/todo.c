@@ -57,17 +57,6 @@ void todo_set_state(Todo_list *td, uint task_index, Task_state ts)
     td->tasks[task_index].state = ts;
 }
 
-// Remove task from todo list by its index
-void todo_rm(Todo_list *td, uint task_index)
-{
-    if(task_index >= td->count) return;
-    // memory leak when this isn't true
-    if(task_index < td->count - 1)
-        for(uint i = task_index; i < td->count - 1; i++)
-            td->tasks[i] = td->tasks[i + 1];
-    td->count--;
-}
-
 // Free todo list
 void todo_free(Todo_list *td)
 {
@@ -117,10 +106,17 @@ void todo_write_file(Todo_list *td, FILE *file)
             case TASK_DONE:
                 fprintf(file, "d");
                 break;
+            case TASK_HOLE:
+                // I feel kind of dirty for using goto, but
+                // I think it's frankly the cleanest way of
+                // avoiding that holes get printed to the
+                // file. Think about it a little.
+                goto do_not_print;
             default:
                 fprintf(file, "?,");
         }
         fprintf(file, "%s\n", td->tasks[i].name);
+do_not_print: ;
     }
 }
 

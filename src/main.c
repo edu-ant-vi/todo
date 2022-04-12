@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 					politely_exit(65);
 				}
 				if((uint) index > td.count) {
-					eprintf("The maximum task index at the moment is %d\n", td.count - 1);
+					eprintf("The maximum task index at the moment is %d\n", td.count);
 					politely_exit(65);
 				}
 				todo_rm(&td, index - 1);
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 					politely_exit(65);
 				}
 				if((uint) index > td.count) {
-					eprintf("The maximum task index at the moment is %d\n", td.count - 1);
+					eprintf("The maximum task index at the moment is %d\n", td.count);
 					politely_exit(65);
 				}
 				todo_set_state(&td, index - 1, TASK_DONE);

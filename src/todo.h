@@ -33,6 +33,7 @@
 typedef enum {
     TASK_TODO,
     TASK_DONE,
+    TASK_HOLE,  // makes the remove operation simpler
 } Task_state;
 
 typedef struct {
@@ -57,7 +58,8 @@ unsigned todo_add(Todo_list *td, Task_state ts, const char *name);
 void todo_set_state(Todo_list *td, uint task_index, Task_state ts);
 
 // Remove task from todo list by its index
-void todo_rm(Todo_list *td, uint task_index);
+#define todo_rm(td, task_index) \
+    todo_set_state(td, task_index, TASK_HOLE)
 
 // Free todo list
 void todo_free(Todo_list *td);
