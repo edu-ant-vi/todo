@@ -37,9 +37,6 @@
 #include "common.h"
 #include "todo.h"
 
-#define FOR_EACH(count, args) \
-	for(int count = 0; args[i] != NULL; count++)
-
 typedef enum {
 	HANDLER_OK,
 	HANDLER_OK_SAVE_CHANGES,
