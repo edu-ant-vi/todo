@@ -30,6 +30,7 @@
 #include "handler.h"
 #include "parse.h"
 
+void usage(const char *name);
 void todo_save(Todo_list *td, FILE *todo_fd);
 
 int main(int argc, char **argv)
@@ -64,6 +65,7 @@ int main(int argc, char **argv)
 			break;
 		case CM_HELP:
 			hr = help_handler(&td, &argv[2]);
+			usage(argv[0]);
 			break;
 		case CM_ADD:
 			hr = add_handler(&td, &argv[2]);
@@ -73,6 +75,9 @@ int main(int argc, char **argv)
 			break;
 		case CM_CHECK:
 			hr = check_handler(&td, &argv[2]);
+			break;
+		case CM_UNCHECK:
+			hr = uncheck_handler(&td, &argv[2]);
 			break;
 		case CM_ERROR:
 			// Stupid user error
@@ -97,18 +102,18 @@ int main(int argc, char **argv)
 			usage(argv[0]);
 			break;
 		case HANDLER_ERROR_PROGRAMMER:
-			exit_code = 2;
+			exit_code = 0xDEAD;
 			break;
 		case HANDLER_ERROR_INVALID_NUMERIC_ARGS:
-			exit_code = 3;
+			exit_code = 2;
 			eprintf("Arguments to %s must be integers\n", argv[1]);
 			break;
 		case HANDLER_ERROR_INDEX_TOO_LOW:
-			exit_code = 4;
+			exit_code = 3;
 			eprintf("The minimum index is 1\n");
 			break;
 		case HANDLER_ERROR_INDEX_TOO_HIGH:
-			exit_code = 5;
+			exit_code = 4;
 			eprintf("The maximum index right now is %d\n", td.count);
 			break;
 		default:
@@ -134,3 +139,17 @@ void todo_save(Todo_list *td, FILE *todo_fd)
 	todo_write_file(td, todo_fd);
 }
 
+// Prints usage text
+void usage(const char *name)
+{
+	const char usage_text[] = 
+		"usage: %s <command>\n\n"
+		"List of commands:\n\n"
+		"help: prints this usage text and exits\n"
+		"add: adds new tasks to the todo list\n"
+		"rm: removes tasks from the todo list\n"
+		"check: marks tasks as done\n"
+		"uncheck: marks tasks as todo again\n"
+		"\nIf no command is given, the todo list is printed to stdout.\n";
+	eprintf(usage_text, name);
+}

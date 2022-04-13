@@ -31,6 +31,7 @@ typedef enum {
     CM_ADD,
     CM_REMOVE,
     CM_CHECK,
+    CM_UNCHECK,
 
     CM_ERROR,
 } Command;

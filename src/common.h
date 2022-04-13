@@ -30,7 +30,4 @@ typedef unsigned uint;
 #define eprintf(...) \
 	fprintf(stderr, __VA_ARGS__);
 
-// Print usage text
-void usage(const char *name);
-
 #endif // TODO_COMMON_H

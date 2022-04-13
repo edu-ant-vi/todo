@@ -58,11 +58,12 @@ Command parse_command(const char *argv1)
 {
     arg = argv1;
 
-    if(arg == NULL)            return CM_NONE;
-    if(check_command("help"))  return CM_HELP;
-    if(check_command("add"))   return CM_ADD;
-    if(check_command("rm"))    return CM_REMOVE;
-    if(check_command("check")) return CM_CHECK;
+    if(arg == NULL)              return CM_NONE;
+    if(check_command("help"))    return CM_HELP;
+    if(check_command("add"))     return CM_ADD;
+    if(check_command("rm"))      return CM_REMOVE;
+    if(check_command("check"))   return CM_CHECK;
+    if(check_command("uncheck")) return CM_UNCHECK;
 
     return CM_ERROR;
 }
