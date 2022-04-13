@@ -20,17 +20,20 @@
    <https://www.gnu.org/licenses/>.
 */
 
-#ifndef TODO_COMMON_H
-#define TODO_COMMON_H
+#include <stdio.h>
 
-#include <stdbool.h>
+#include "common.h"
 
-typedef unsigned uint;
-
-#define eprintf(...) \
-	fprintf(stderr, __VA_ARGS__);
-
-// Print usage text
-void usage(const char *name);
-
-#endif // TODO_COMMON_H
+// Prints usage text
+void usage(const char *name)
+{
+	const char usage_text[] = 
+		"usage: %s <command>\n\n"
+		"List of commands:\n\n"
+		"help:  prints this usage text and exits\n"
+		"add:   adds new tasks to the todo list\n"
+		"rm:    removes tasks from the todo list\n"
+		"check: marks tasks as done\n"
+		"\nIf no command is given, the todo list is printed to stdout.\n";
+	eprintf(usage_text, name);
+}

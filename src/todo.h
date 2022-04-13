@@ -52,7 +52,7 @@ typedef struct {
 void todo_init(Todo_list *td);
 
 // Add task to todo list and return its index on it
-unsigned todo_add(Todo_list *td, Task_state ts, const char *name);
+uint todo_add(Todo_list *td, Task_state ts, const char *name);
 
 // Set the state of a task by its index
 void todo_set_state(Todo_list *td, uint task_index, Task_state ts);

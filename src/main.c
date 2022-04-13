@@ -18,7 +18,7 @@
    You should have received a copy of the GNU General
    Public License along with todo. If not, see
    <https://www.gnu.org/licenses/>.
-   */
+*/
 
 // A cli todo app. Because creativity was never an option.
 
@@ -27,16 +27,10 @@
 
 #include "common.h"
 #include "todo.h"
+#include "handler.h"
 #include "parse.h"
 
-// Exit like a gentleman
-#define politely_exit(code) \
-	todo_free(&td);         \
-	fclose(todo_file);      \
-	exit(code);
-
-void usage(const char *name);
-void todo_save(Todo_list *td, FILE *todo_file);
+void todo_save(Todo_list *td, FILE *todo_fd);
 
 int main(int argc, char **argv)
 {
@@ -45,123 +39,98 @@ int main(int argc, char **argv)
 	Todo_list td;
 	todo_init(&td);
 
-	FILE *todo_file = fopen(todo_filename, "r");
+	FILE *todo_fd = fopen(todo_filename, "r");
 
-	if(todo_file != NULL) {
+	if(todo_fd != NULL) {
 		// If the file exists, we read it
-		todo_read_file(&td, todo_file);
+		todo_read_file(&td, todo_fd);
 	} else {
 		// Otherwise, we attempt to create it
-		todo_file = fopen(todo_filename, "w");
-		if(todo_file == NULL) {
+		todo_fd = fopen(todo_filename, "w");
+		if(todo_fd == NULL) {
 			eprintf("Could not access nor create file '%s'\n", todo_filename);
 			todo_free(&td);
 			return 1;
 		}
 	}
 
+	Handler_res hr;
 	Command cm = parse_command(argv[1]);
+	// Call the appropriate handler
 	switch(cm) {
 		case CM_NONE:
-			// No command was given: prints todo list
 			todo_print(&td);
-			politely_exit(0);
+			hr = HANDLER_OK;
+			break;
 		case CM_HELP:
-			// help command: prints usage
-			eprintf("Manage todo lists from the command line.\n\n");
-			usage(argv[0]);
-			politely_exit(0);
+			hr = help_handler(&td, &argv[2]);
+			break;
 		case CM_ADD:
-			// add command: iterates over its arguments, using them
-			// as names for new tasks for the todo list.
-			for(int i = 2; argv[i] != NULL; i++) {
-				todo_add(&td, TASK_TODO, argv[i]);
-			}
-			todo_save(&td, todo_file);
-			politely_exit(0);
+			hr = add_handler(&td, &argv[2]);
+			break;
 		case CM_REMOVE:
-			// rm command: iterates over its arguments, using them as
-			// indexes for tasks to remove.
-			for(int i = 2; argv[i] != NULL; i++) {
-				int n;
-				int index;
-				n = sscanf(argv[i], "%d", &index);
-				if(n == EOF) {
-					eprintf("Arguments to rm must be numeric\n");
-					politely_exit(65);
-				}
-				if(index <= 0) {
-					eprintf("Task indexes start from 1\n");
-					politely_exit(65);
-				}
-				if((uint) index > td.count) {
-					eprintf("The maximum task index at the moment is %d\n", td.count);
-					politely_exit(65);
-				}
-				todo_rm(&td, index - 1);
-			}
-			todo_save(&td, todo_file);
-			politely_exit(0);
+			hr = rm_handler(&td, &argv[2]);
+			break;
 		case CM_CHECK:
-			// check command: iterates over its arguments, using them
-			// as indexes for tasks to mark as done.
-			for(int i = 2; argv[i] != NULL; i++) {
-				int n;
-				int index;
-				n = sscanf(argv[i], "%d", &index);
-				if(n == EOF) {
-					eprintf("Arguments to check must be numeric\n");
-					politely_exit(65);
-				}
-				if(index <= 0) {
-					eprintf("Task indexes start from 1\n");
-					politely_exit(65);
-				}
-				if((uint) index > td.count) {
-					eprintf("The maximum task index at the moment is %d\n", td.count);
-					politely_exit(65);
-				}
-				todo_set_state(&td, index - 1, TASK_DONE);
-			}
-			todo_save(&td, todo_file);
-			politely_exit(0);
+			hr = check_handler(&td, &argv[2]);
+			break;
 		case CM_ERROR:
 			// Stupid user error
-			eprintf("Unrecognized command\n\n");
-			usage(argv[0]);
-			politely_exit(64);
+			eprintf("Unrecognized command %s\n\n", argv[1]);
+			hr = HANDLER_ERROR_USAGE;
+			break;
 		default:
 			// Stupid programmer error
-			eprintf("Unhandled command: %d\n", cm);
-			politely_exit(1024);
+			eprintf("Unhandled command %s\n", argv[1]);
+			hr = HANDLER_ERROR_PROGRAMMER;
 	}
 
-	todo_save(&td, todo_file);
-	politely_exit(0);
+	int exit_code = 0;
+	switch(hr) {
+		case HANDLER_OK:
+			break;
+		case HANDLER_OK_SAVE_CHANGES:
+			todo_save(&td, todo_fd);
+			break;
+		case HANDLER_ERROR_USAGE:
+			exit_code = 1;
+			usage(argv[0]);
+			break;
+		case HANDLER_ERROR_PROGRAMMER:
+			exit_code = 2;
+			break;
+		case HANDLER_ERROR_INVALID_NUMERIC_ARGS:
+			exit_code = 3;
+			eprintf("Arguments to %s must be integers\n", argv[1]);
+			break;
+		case HANDLER_ERROR_INDEX_TOO_LOW:
+			exit_code = 4;
+			eprintf("The minimum index is 1\n");
+			break;
+		case HANDLER_ERROR_INDEX_TOO_HIGH:
+			exit_code = 5;
+			eprintf("The maximum index right now is %d\n", td.count);
+			break;
+		default:
+			// Stupid programmer strikes again
+			exit_code = 0xDEAD;
+			eprintf("Unhandled handler result\n");
+	}
+
+	todo_free(&td);
+	fclose(todo_fd);
+	return exit_code;
 }
 
-void todo_save(Todo_list *td, FILE *todo_file)
+void todo_save(Todo_list *td, FILE *todo_fd)
 {
-	todo_file = freopen(NULL, "w", todo_file);
-	if(todo_file == NULL) {
+	todo_fd = freopen(NULL, "w", todo_fd);
+	if(todo_fd == NULL) {
 		eprintf("Could not save changes to the TODO file\n"
 				"Perhaps you don't have write permissions on it?\n");
 		todo_free(td);
 		exit(1);
 	}
-	todo_write_file(td, todo_file);
+	todo_write_file(td, todo_fd);
 }
 
-// Prints usage text
-void usage(const char *name)
-{
-	const char usage_text[] = 
-		"usage: %s <command>\n\n"
-		"List of commands:\n\n"
-		"help:  prints this usage text and exits\n"
-		"add:   adds new tasks to the todo list\n"
-		"rm:    removes tasks from the todo list\n"
-		"check: marks tasks as done\n"
-		"\nIf no command is given, the todo list is printed to stdout.\n";
-	eprintf(usage_text, name);
-}

@@ -85,6 +85,8 @@ void todo_print(Todo_list *td)
             case TASK_DONE:
                 printf("[✓] ");
                 break;
+            case TASK_HOLE:
+                continue;
             default:
                 // Should never happen
                 fprintf(stderr, "Unrecognized task state\n");
@@ -107,16 +109,13 @@ void todo_write_file(Todo_list *td, FILE *file)
                 fprintf(file, "d");
                 break;
             case TASK_HOLE:
-                // I feel kind of dirty for using goto, but
-                // I think it's frankly the cleanest way of
-                // avoiding that holes get printed to the
-                // file. Think about it a little.
-                goto do_not_print;
+                // By not saving the holes, we effectively
+                // delete them
+                continue;
             default:
                 fprintf(file, "?,");
         }
         fprintf(file, "%s\n", td->tasks[i].name);
-do_not_print: ;
     }
 }
 
