@@ -99,6 +99,21 @@ Handler_res uncheck_handler(Todo_list *td, char *args[])
 	return HANDLER_OK_SAVE_CHANGES;
 }
 
+Handler_res work_on_handler(Todo_list *td, char *args[])
+{
+	int index = 0;
+	FOR_EACH_ARG_AS_INDEX(index) {
+		for(int j = 0; j < td->count; j++) {
+			if(j == index - 1) {
+				td->tasks[j].state = TASK_WIP;
+			} else if(td->tasks[j].state == TASK_WIP) {
+				td->tasks[j].state = TASK_DONE;
+			}
+		}
+	}
+	return HANDLER_OK_SAVE_CHANGES;
+}
+
 Handler_res error_handler(Todo_list *td, char *args[])
 {
 	eprintf("Unrecognized command %s\n\n", args[1]);

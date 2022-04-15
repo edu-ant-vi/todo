@@ -31,6 +31,7 @@ char command[NUM_COMMANDS - 1][8] = {
     [CM_REMOVE]  = "rm",
     [CM_CHECK]   = "check",
     [CM_UNCHECK] = "uncheck",
+    [CM_WORK_ON] = "work-on",
 };
 
 static const char *arg;

@@ -37,6 +37,8 @@ void usage(const char *name)
 		"rm: removes tasks from the todo list\n"
 		"check: marks tasks as done\n"
 		"uncheck: marks tasks as todo again\n"
-		"\nIf no command is given, the todo list is printed to stdout.\n";
+		"work-on: marks tasks as work-in-progress\n"
+		"\nIf no command is given, the todo list is printed to stdout.\n"
+		"Note that there may only be one work-in-progress task at any given moment.\n";
 	eprintf(usage_text, name);
 }

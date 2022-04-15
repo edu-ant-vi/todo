@@ -82,6 +82,9 @@ void todo_print(Todo_list *td)
             case TASK_TODO:
                 printf("[ ] ");
                 break;
+            case TASK_WIP:
+                printf("[-] ");
+                break;
             case TASK_DONE:
                 printf("[✓] ");
                 break;
@@ -104,6 +107,9 @@ void todo_write_file(Todo_list *td, FILE *file)
         switch(td->tasks[i].state) {
             case TASK_TODO:
                 fprintf(file, "t");
+                break;
+            case TASK_WIP:
+                fprintf(file, "w");
                 break;
             case TASK_DONE:
                 fprintf(file, "d");
@@ -130,6 +136,7 @@ void todo_read_file(Todo_list *td, FILE *file)
         if(i == EOF) return;
         switch(ch) {
             case 't': ts = TASK_TODO; break;
+            case 'w': ts = TASK_WIP;  break;
             case 'd': ts = TASK_DONE; break;
             default:
                 // Should never happen

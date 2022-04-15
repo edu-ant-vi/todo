@@ -38,6 +38,7 @@ Handler handler[] = {
 	[CM_REMOVE]  = rm_handler,
 	[CM_CHECK]   = check_handler,
 	[CM_UNCHECK] = uncheck_handler,
+	[CM_WORK_ON] = work_on_handler,
 	[CM_ERROR]   = error_handler,
 };
 

@@ -62,6 +62,8 @@ Handler_res check_handler(Todo_list *td, char *args[]);
 
 Handler_res uncheck_handler(Todo_list *td, char *args[]);
 
+Handler_res work_on_handler(Todo_list *td, char *args[]);
+
 Handler_res error_handler(Todo_list *td, char *args[]);
 
 #endif // TODO_HANDLER_H

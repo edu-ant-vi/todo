@@ -32,6 +32,7 @@
 
 typedef enum {
     TASK_TODO,
+    TASK_WIP,
     TASK_DONE,
     TASK_HOLE,  // makes the remove operation simpler
 } Task_state;

@@ -33,6 +33,7 @@ typedef enum {
     CM_REMOVE,
     CM_CHECK,
     CM_UNCHECK,
+    CM_WORK_ON,
 
     CM_ERROR,
     NUM_COMMANDS,
