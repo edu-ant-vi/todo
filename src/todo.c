@@ -69,7 +69,7 @@ void todo_free(Todo_list *td)
 // Print todo list in readable format
 void todo_print(Todo_list *td)
 {
-    printf("=== TODO ===\n");
+    printf("\n");
 
     if(td->count == 0) {
         printf("No tasks. Rejoice!\n");

@@ -27,10 +27,20 @@
 
 #include "common.h"
 #include "todo.h"
+#include "help.h"
 #include "handler.h"
-#include "parse.h"
+#include "commands.h"
 
-void usage(const char *name);
+Handler handler[] = {
+	[CM_NONE]    = none_handler,
+	[CM_HELP]    = help_handler,
+	[CM_ADD]     = add_handler,
+	[CM_REMOVE]  = rm_handler,
+	[CM_CHECK]   = check_handler,
+	[CM_UNCHECK] = uncheck_handler,
+	[CM_ERROR]   = error_handler,
+};
+
 void todo_save(Todo_list *td, FILE *todo_fd);
 
 int main(int argc, char **argv)
@@ -56,38 +66,13 @@ int main(int argc, char **argv)
 	}
 
 	Handler_res hr;
-	Command cm = parse_command(argv[1]);
-	// Call the appropriate handler
-	switch(cm) {
-		case CM_NONE:
-			todo_print(&td);
-			hr = HANDLER_OK;
-			break;
-		case CM_HELP:
-			hr = help_handler(&td, &argv[2]);
-			usage(argv[0]);
-			break;
-		case CM_ADD:
-			hr = add_handler(&td, &argv[2]);
-			break;
-		case CM_REMOVE:
-			hr = rm_handler(&td, &argv[2]);
-			break;
-		case CM_CHECK:
-			hr = check_handler(&td, &argv[2]);
-			break;
-		case CM_UNCHECK:
-			hr = uncheck_handler(&td, &argv[2]);
-			break;
-		case CM_ERROR:
-			// Stupid user error
-			eprintf("Unrecognized command %s\n\n", argv[1]);
-			hr = HANDLER_ERROR_USAGE;
-			break;
-		default:
-			// Stupid programmer error
-			eprintf("Unhandled command %s\n", argv[1]);
-			hr = HANDLER_ERROR_PROGRAMMER;
+	Command c = parse(argv[1]);
+	if(c < CM_NONE || c > CM_ERROR) {
+		// Stupid programmer error
+		hr = HANDLER_ERROR_PROGRAMMER;
+		eprintf("Unhandled command: %s\n", argv[1]);
+	} else {
+		hr = handler[c](&td, argv);
 	}
 
 	int exit_code = 0;
@@ -137,19 +122,4 @@ void todo_save(Todo_list *td, FILE *todo_fd)
 		exit(1);
 	}
 	todo_write_file(td, todo_fd);
-}
-
-// Prints usage text
-void usage(const char *name)
-{
-	const char usage_text[] = 
-		"usage: %s <command>\n\n"
-		"List of commands:\n\n"
-		"help: prints this usage text and exits\n"
-		"add: adds new tasks to the todo list\n"
-		"rm: removes tasks from the todo list\n"
-		"check: marks tasks as done\n"
-		"uncheck: marks tasks as todo again\n"
-		"\nIf no command is given, the todo list is printed to stdout.\n";
-	eprintf(usage_text, name);
 }

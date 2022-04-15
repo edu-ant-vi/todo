@@ -24,6 +24,7 @@
 
 #include "common.h"
 #include "handler.h"
+#include "help.h"
 #include "todo.h"
 
 // Helpful macros:
@@ -31,7 +32,7 @@
 // Iterates over the arguments given to the handler as they
 // are, binding args[i] to each element on the way.
 #define FOR_EACH_ARG() \
-	for(int i = 0; args[i] != NULL; i++)
+	for(int i = 2; args[i] != NULL; i++)
 
 // Iterates over the arguments given to the handler,
 // parsing them as indices for the todo list. It binds each
@@ -39,7 +40,7 @@
 // pasing errors by returning the appropriate Handler_res
 // values. 
 #define FOR_EACH_ARG_AS_INDEX(num) \
-	for(int i = 0; args[i] != NULL; i++)               \
+	for(int i = 2; args[i] != NULL; i++)               \
 	    if(sscanf(args[i], "%d", &num) == EOF)         \
 		    return HANDLER_ERROR_INVALID_NUMERIC_ARGS; \
 		else if(num <= 0)                              \
@@ -50,11 +51,16 @@
 
 // Actual handlers:
 
+Handler_res none_handler(Todo_list *td, char *args[])
+{
+	todo_print(td);
+	return HANDLER_OK;
+}
+
 Handler_res help_handler(Todo_list *td, char *args[])
 {
 	eprintf("Manage todo lists from the command line.\n\n");
-	// The heavy lifting will be done outside this function
-	// for the time being
+	usage(args[0]);
 	return HANDLER_OK;
 }
 
@@ -91,4 +97,10 @@ Handler_res uncheck_handler(Todo_list *td, char *args[])
 		todo_set_state(td, index - 1, TASK_TODO);
 	}
 	return HANDLER_OK_SAVE_CHANGES;
+}
+
+Handler_res error_handler(Todo_list *td, char *args[])
+{
+	eprintf("Unrecognized command %s\n\n", args[1]);
+	return HANDLER_ERROR_USAGE;
 }

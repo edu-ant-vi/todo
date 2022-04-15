@@ -48,7 +48,9 @@ typedef enum {
 	HANDLER_ERROR_INDEX_TOO_HIGH,
 } Handler_res;
 
-typedef Handler_res (*CommandHandler)(Todo_list*, char**);
+typedef Handler_res (*Handler)(Todo_list*, char**);
+
+Handler_res none_handler(Todo_list *td, char *args[]);
 
 Handler_res help_handler(Todo_list *td, char *args[]);
 
@@ -59,5 +61,7 @@ Handler_res rm_handler(Todo_list *td, char *args[]);
 Handler_res check_handler(Todo_list *td, char *args[]);
 
 Handler_res uncheck_handler(Todo_list *td, char *args[]);
+
+Handler_res error_handler(Todo_list *td, char *args[]);
 
 #endif // TODO_HANDLER_H

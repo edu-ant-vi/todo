@@ -23,16 +23,17 @@
 #include <string.h>
 
 #include "common.h"
-#include "parse.h"
+#include "commands.h"
+
+char command[NUM_COMMANDS - 1][8] = {
+    [CM_HELP]    = "help",
+    [CM_ADD]     = "add",
+    [CM_REMOVE]  = "rm",
+    [CM_CHECK]   = "check",
+    [CM_UNCHECK] = "uncheck",
+};
 
 static const char *arg;
-
-// Check if arg is a short command starting with `ch`
-static bool check_short(char ch)
-{
-    // Don't this right now, but I might eventually
-    return arg[0] == ch && arg[1] == '\0';
-}
 
 // Check if arg is a long command that ends with `rest`
 static bool check_long(const char *rest)
@@ -53,17 +54,16 @@ static bool check_command(const char *command)
     return false;
 }
 
-// Does what it promises
-Command parse_command(const char *argv1)
+// Parse subcommand
+Command parse(const char *argv1)
 {
     arg = argv1;
 
-    if(arg == NULL)              return CM_NONE;
-    if(check_command("help"))    return CM_HELP;
-    if(check_command("add"))     return CM_ADD;
-    if(check_command("rm"))      return CM_REMOVE;
-    if(check_command("check"))   return CM_CHECK;
-    if(check_command("uncheck")) return CM_UNCHECK;
+    if(arg == NULL) return CM_NONE;
+
+    for(int i = 1; i < NUM_COMMANDS - 1; i++)
+        if(check_command(command[i]))
+            return i;
 
     return CM_ERROR;
 }

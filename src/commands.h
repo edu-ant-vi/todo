@@ -20,13 +20,14 @@
    <https://www.gnu.org/licenses/>.
 */
 
-// CLI parsing module for todo.
+// This module defines the valid subcommands for todo,
+// along with a parse function to recognize them.
 
 #ifndef TODO_PARSE_H
 #define TODO_PARSE_H
 
 typedef enum {
-    CM_NONE,
+    CM_NONE = 0,
     CM_HELP,
     CM_ADD,
     CM_REMOVE,
@@ -34,9 +35,10 @@ typedef enum {
     CM_UNCHECK,
 
     CM_ERROR,
+    NUM_COMMANDS,
 } Command;
 
-// Does what it promises
-Command parse_command(const char *argv1);
+// Parse subcommand
+Command parse(const char *argv1);
 
 #endif // TODO_PARSE_H
