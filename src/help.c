@@ -27,18 +27,67 @@
 #include "commands.h"
 
 // Print usage text for todo
-void usage(const char *name)
+void usage(const char *exec)
 {
 	const char usage_text[] = 
-		"usage: %s <command>\n\n"
+		"usage %s <command>\n\n"
 		"List of commands:\n\n"
-		"help: prints this usage text and exits\n"
-		"add: adds new tasks to the todo list\n"
-		"rm: removes tasks from the todo list\n"
-		"check: marks tasks as done\n"
-		"uncheck: marks tasks as todo again\n"
-		"work-on: marks tasks as work-in-progress\n"
+		"h, help       print this usage text\n"
+		"a, add        add new tasks to the todo list\n"
+		"r, rm         remove tasks from the todo list\n"
+		"c, check      mark tasks as done\n"
+		"u, uncheck    mark tasks as todo again\n"
+		"w, work-on    mark tasks as work-in-progress\n"
 		"\nIf no command is given, the todo list is printed to stdout.\n"
 		"Note that there may only be one work-in-progress task at any given moment.\n";
-	eprintf(usage_text, name);
+	eprintf(usage_text, exec);
+}
+
+// Print help for an specific command
+bool help(const char *exec, Command c)
+{
+	switch(c) {
+		case CM_NONE: 
+			// Should never happen
+			break;
+		case CM_HELP: 
+			printf("Shows how to use a given command.\n\n"
+				   "usage: %s help [command]\n\n"
+				   "If no command is given, todo's general usage text is shown.\n",
+				   exec);
+			break;
+		case CM_ADD: 
+			printf("Adds tasks to the todo list.\n\n"
+				   "usage: %s add [task-name...]\n",
+				   exec);
+			break;
+		case CM_REMOVE: 
+			printf("Removes tasks from the todo list.\n\n"
+				   "usage: %s rm [task-index...]\n",
+				   exec);
+			break;
+		case CM_CHECK: 
+			printf("Marks tasks as done.\n\n"
+				   "usage: %s check [task-index...]\n",
+				   exec);
+			break;
+		case CM_UNCHECK: 
+			printf("Masks tasks as incomplete.\n\n"
+				   "usage: %s uncheck [tasks-index...]\n",
+				   exec);
+			break;
+		case CM_WORK_ON: 
+			printf("Marks tasks as work-in-progress.\n\n"
+				   "usage: %s work-on [task-index...]\n\n"
+				   "Note that there may only be one work-in-progress task per todo"
+				   " list. If there is already a work-in-progress task in the "
+				   "current todo list when this command is used, it will mark that"
+				   " task as done. This means that, if multiple arguments are given"
+				   " to it, it will mark all given tasks but the last as complete.\n",
+				   exec);
+			break;
+		default:
+			return false;
+	}
+	return true;
 }

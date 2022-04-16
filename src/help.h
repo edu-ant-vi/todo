@@ -23,12 +23,13 @@
 #ifndef TODO_HELP_H
 #define TODO_HELP_H
 
+#include "common.h"
 #include "commands.h"
 
 // Print usage text for todo
 void usage(const char *name);
 
 // Print help for an specific command
-void help(const char *name, Command c);
+bool help(const char *exec, Command c);
 
 #endif // TODO_HELP_H

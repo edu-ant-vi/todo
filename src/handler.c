@@ -24,6 +24,7 @@
 
 #include "common.h"
 #include "handler.h"
+#include "commands.h"
 #include "help.h"
 #include "todo.h"
 
@@ -59,8 +60,17 @@ Handler_res none_handler(Todo_list *td, char *args[])
 
 Handler_res help_handler(Todo_list *td, char *args[])
 {
-	eprintf("Manage todo lists from the command line.\n\n");
-	usage(args[0]);
+	if(args[2] != NULL) {
+		Command c = parse(args[2]);
+		bool ok = help(args[0], c);
+		if(!ok) {
+			eprintf("Unrecognized command: %s\n\n", args[2]);
+			return HANDLER_ERROR_USAGE;
+		}
+	} else {
+		eprintf("Manage todo lists from the command line.\n\n");
+		usage(args[0]);
+	}
 	return HANDLER_OK;
 }
 
