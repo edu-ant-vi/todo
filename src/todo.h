@@ -66,7 +66,7 @@ void todo_set_state(Todo_list *td, uint task_index, Task_state ts);
 void todo_free(Todo_list *td);
 
 // Print todo list in readable format
-void todo_print(Todo_list *td);
+void todo_print(Todo_list *td, bool ascii_only);
 
 // Write todo list to file
 void todo_write_file(Todo_list *td, FILE *file);

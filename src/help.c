@@ -51,33 +51,33 @@ bool help(const char *exec, Command c)
 			// Should never happen
 			break;
 		case CM_HELP: 
-			printf("Shows how to use a given command.\n\n"
+			printf("Show how to use a given command.\n\n"
 				   "usage: %s help [command]\n\n"
 				   "If no command is given, todo's general usage text is shown.\n",
 				   exec);
 			break;
 		case CM_ADD: 
-			printf("Adds tasks to the todo list.\n\n"
+			printf("Add tasks to the todo list.\n\n"
 				   "usage: %s add [task-name...]\n",
 				   exec);
 			break;
 		case CM_REMOVE: 
-			printf("Removes tasks from the todo list.\n\n"
+			printf("Remove tasks from the todo list.\n\n"
 				   "usage: %s rm [task-index...]\n",
 				   exec);
 			break;
 		case CM_CHECK: 
-			printf("Marks tasks as done.\n\n"
+			printf("Mark tasks as done.\n\n"
 				   "usage: %s check [task-index...]\n",
 				   exec);
 			break;
 		case CM_UNCHECK: 
-			printf("Masks tasks as incomplete.\n\n"
+			printf("Mask tasks as todo again.\n\n"
 				   "usage: %s uncheck [tasks-index...]\n",
 				   exec);
 			break;
 		case CM_WORK_ON: 
-			printf("Marks tasks as work-in-progress.\n\n"
+			printf("Mark tasks as work-in-progress.\n\n"
 				   "usage: %s work-on [task-index...]\n\n"
 				   "Note that there may only be one work-in-progress task per todo"
 				   " list. If there is already a work-in-progress task in the "

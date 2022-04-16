@@ -30,6 +30,7 @@
 #include "help.h"
 #include "handler.h"
 #include "commands.h"
+#include "config.h"
 
 Handler handler[] = {
 	[CM_NONE]    = none_handler,
@@ -44,44 +45,55 @@ Handler handler[] = {
 
 void todo_save(Todo_list *td, FILE *todo_fd);
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-	const char todo_filename[] = "TODO";
+	// Configuration step
+	Config conf;
+	configure(&conf);
 
+	// Setup step
 	Todo_list td;
 	todo_init(&td);
 
-	FILE *todo_fd = fopen(todo_filename, "r");
+	FILE *todo_fd = fopen(conf.filename, "r");
 
 	if(todo_fd != NULL) {
 		// If the file exists, we read it
 		todo_read_file(&td, todo_fd);
 	} else {
 		// Otherwise, we attempt to create it
-		todo_fd = fopen(todo_filename, "w");
+		todo_fd = fopen(conf.filename, "w");
 		if(todo_fd == NULL) {
-			eprintf("Could not access nor create file '%s'\n", todo_filename);
+			eprintf("Could not access nor create file '%s'\n", conf.filename);
 			todo_free(&td);
 			return 1;
 		}
 	}
 
+	// Program logic step
 	Handler_res hr;
 	Command c = parse(argv[1]);
-	if(c < CM_NONE || c > CM_ERROR) {
+	if(c >= CM_NONE && c <= CM_ERROR) {
+		hr = handler[c](&td, argv);
+	} else {
 		// Stupid programmer error
 		hr = HANDLER_ERROR_PROGRAMMER;
 		eprintf("Unhandled command: %s\n", argv[1]);
-	} else {
-		hr = handler[c](&td, argv);
 	}
 
+	// Error handling step
 	int exit_code = 0;
 	switch(hr) {
 		case HANDLER_OK:
+			if(!conf.quiet || c == CM_NONE) {
+				todo_print(&td, conf.ascii_only);
+			}
 			break;
 		case HANDLER_OK_SAVE_CHANGES:
 			todo_save(&td, todo_fd);
+			if(!conf.quiet) {
+				todo_print(&td, conf.ascii_only);
+			}
 			break;
 		case HANDLER_ERROR_USAGE:
 			exit_code = 1;
@@ -108,6 +120,7 @@ int main(int argc, char **argv)
 			eprintf("Unhandled handler result\n");
 	}
 
+	// Cleanup step
 	todo_free(&td);
 	fclose(todo_fd);
 	return exit_code;

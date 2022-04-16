@@ -54,7 +54,6 @@
 
 Handler_res none_handler(Todo_list *td, char *args[])
 {
-	todo_print(td);
 	return HANDLER_OK;
 }
 
@@ -113,7 +112,7 @@ Handler_res work_on_handler(Todo_list *td, char *args[])
 {
 	int index = 0;
 	FOR_EACH_ARG_AS_INDEX(index) {
-		for(int j = 0; j < td->count; j++) {
+		for(int j = 0; (uint) j < td->count; j++) {
 			if(j == index - 1) {
 				td->tasks[j].state = TASK_WIP;
 			} else if(td->tasks[j].state == TASK_WIP) {

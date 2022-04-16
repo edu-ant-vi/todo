@@ -67,7 +67,7 @@ void todo_free(Todo_list *td)
 }
 
 // Print todo list in readable format
-void todo_print(Todo_list *td)
+void todo_print(Todo_list *td, bool ascii_only)
 {
     printf("\n");
 
@@ -76,7 +76,12 @@ void todo_print(Todo_list *td)
         return;
     }
 
+    const char *done = ascii_only ? "X" : "✓";
+
     for(uint i = 0; i < td->count; i++) {
+        if(td->tasks[i].state == TASK_HOLE)
+            continue;
+
         printf(" %d ", i + 1);
         switch(td->tasks[i].state) {
             case TASK_TODO:
@@ -86,7 +91,7 @@ void todo_print(Todo_list *td)
                 printf("[-] ");
                 break;
             case TASK_DONE:
-                printf("[✓] ");
+                printf("[%s] ", done);
                 break;
             case TASK_HOLE:
                 continue;
