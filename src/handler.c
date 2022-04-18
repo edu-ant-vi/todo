@@ -33,7 +33,7 @@
 // Iterates over the arguments given to the handler as they
 // are, binding args[i] to each element on the way.
 #define FOR_EACH_ARG() \
-	for(int i = 2; args[i] != NULL; i++)
+	for(int i = 0; i < argc; i++)
 
 // Iterates over the arguments given to the handler,
 // parsing them as indices for the todo list. It binds each
@@ -41,8 +41,8 @@
 // pasing errors by returning the appropriate Handler_res
 // values. 
 #define FOR_EACH_ARG_AS_INDEX(num) \
-	for(int i = 2; args[i] != NULL; i++)               \
-	    if(sscanf(args[i], "%d", &num) == EOF)         \
+	for(int i = 0; i < argc; i++)                      \
+	    if(sscanf(argv[i], "%d", &num) == EOF)         \
 		    return HANDLER_ERROR_INVALID_NUMERIC_ARGS; \
 		else if(num <= 0)                              \
 		    return HANDLER_ERROR_INDEX_TOO_LOW;        \
@@ -52,36 +52,25 @@
 
 // Actual handlers:
 
-Handler_res none_handler(Todo_list *td, char *args[])
+Handler_res none_handler(Todo_list *td, int argc, char *argv[])
 {
 	return HANDLER_OK;
 }
 
-Handler_res help_handler(Todo_list *td, char *args[])
+Handler_res help_handler(Todo_list *td, int argc, char *argv[])
 {
-	if(args[2] != NULL) {
-		Command c = parse(args[2]);
-		bool ok = help(args[0], c);
-		if(!ok) {
-			eprintf("Unrecognized command: %s\n\n", args[2]);
-			return HANDLER_ERROR_USAGE;
-		}
-	} else {
-		eprintf("Manage todo lists from the command line.\n\n");
-		usage(args[0]);
-	}
-	return HANDLER_OK;
+	return HANDLER_OK_HELP;
 }
 
-Handler_res add_handler(Todo_list *td, char *args[])
+Handler_res add_handler(Todo_list *td, int argc, char *argv[])
 {
 	FOR_EACH_ARG() {
-		todo_add(td, TASK_TODO, args[i]);
+		todo_add(td, TASK_TODO, argv[i]);
 	}
 	return HANDLER_OK_SAVE_CHANGES;
 }
 
-Handler_res rm_handler(Todo_list *td, char *args[])
+Handler_res rm_handler(Todo_list *td, int argc, char *argv[])
 {
 	int index = 0;
 	FOR_EACH_ARG_AS_INDEX(index) {
@@ -90,7 +79,7 @@ Handler_res rm_handler(Todo_list *td, char *args[])
 	return HANDLER_OK_SAVE_CHANGES;
 }
 
-Handler_res check_handler(Todo_list *td, char *args[])
+Handler_res check_handler(Todo_list *td, int argc, char *argv[])
 {
 	int index = 0;
 	FOR_EACH_ARG_AS_INDEX(index) {
@@ -99,7 +88,7 @@ Handler_res check_handler(Todo_list *td, char *args[])
 	return HANDLER_OK_SAVE_CHANGES;
 }
 
-Handler_res uncheck_handler(Todo_list *td, char *args[])
+Handler_res uncheck_handler(Todo_list *td, int argc, char *argv[])
 {
 	int index = 0;
 	FOR_EACH_ARG_AS_INDEX(index) {
@@ -108,7 +97,7 @@ Handler_res uncheck_handler(Todo_list *td, char *args[])
 	return HANDLER_OK_SAVE_CHANGES;
 }
 
-Handler_res work_on_handler(Todo_list *td, char *args[])
+Handler_res work_on_handler(Todo_list *td, int argc, char *argv[])
 {
 	int index = 0;
 	FOR_EACH_ARG_AS_INDEX(index) {
@@ -123,8 +112,8 @@ Handler_res work_on_handler(Todo_list *td, char *args[])
 	return HANDLER_OK_SAVE_CHANGES;
 }
 
-Handler_res error_handler(Todo_list *td, char *args[])
+Handler_res error_handler(Todo_list *td, int argc, char *argv[])
 {
-	eprintf("Unrecognized command %s\n\n", args[1]);
+	eprintf("Unrecognized command %s\n\n", argv[1]);
 	return HANDLER_ERROR_USAGE;
 }

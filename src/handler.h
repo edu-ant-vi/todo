@@ -39,6 +39,7 @@
 
 typedef enum {
 	HANDLER_OK,
+	HANDLER_OK_HELP,
 	HANDLER_OK_SAVE_CHANGES,
 
 	HANDLER_ERROR_USAGE,
@@ -48,22 +49,22 @@ typedef enum {
 	HANDLER_ERROR_INDEX_TOO_HIGH,
 } Handler_res;
 
-typedef Handler_res (*Handler)(Todo_list*, char**);
+typedef Handler_res (*Handler)(Todo_list*, int, char**);
 
-Handler_res none_handler(Todo_list *td, char *args[]);
+Handler_res none_handler(Todo_list *td, int argc, char *argv[]);
 
-Handler_res help_handler(Todo_list *td, char *args[]);
+Handler_res help_handler(Todo_list *td, int argc, char *argv[]);
 
-Handler_res add_handler(Todo_list *td, char *args[]);
+Handler_res add_handler(Todo_list *td, int argc, char *argv[]);
 
-Handler_res rm_handler(Todo_list *td, char *args[]);
+Handler_res rm_handler(Todo_list *td, int argc, char *argv[]);
 
-Handler_res check_handler(Todo_list *td, char *args[]);
+Handler_res check_handler(Todo_list *td, int argc, char *argv[]);
 
-Handler_res uncheck_handler(Todo_list *td, char *args[]);
+Handler_res uncheck_handler(Todo_list *td, int argc, char *argv[]);
 
-Handler_res work_on_handler(Todo_list *td, char *args[]);
+Handler_res work_on_handler(Todo_list *td, int argc, char *argv[]);
 
-Handler_res error_handler(Todo_list *td, char *args[]);
+Handler_res error_handler(Todo_list *td, int argc, char *argv[]);
 
 #endif // TODO_HANDLER_H

@@ -48,7 +48,6 @@ bool help(const char *exec, Command c)
 {
 	switch(c) {
 		case CM_NONE: 
-			// Should never happen
 			break;
 		case CM_HELP: 
 			printf("Show how to use a given command.\n\n"

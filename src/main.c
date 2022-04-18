@@ -22,6 +22,14 @@
 
 // A cli todo app. Because creativity was never an option.
 
+// Introducing command-line options isn't going to be as straightforward
+// as I thought it would, because it disrupts one fundamental assumption
+// of my current handlers: that they will have full access to the argv
+// array. I could give them the full array and also pass them optind, so
+// they know where to start. Or I could change the handlers in such a way
+// that they don't need to know the full argv array. The second option
+// feels more natural, so it's what I'm going to attemp at first.
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -74,7 +82,7 @@ int main(int argc, char *argv[])
 	Handler_res hr;
 	Command c = parse(argv[1]);
 	if(c >= CM_NONE && c <= CM_ERROR) {
-		hr = handler[c](&td, argv);
+		hr = handler[c](&td, argc - 2, &argv[2]);
 	} else {
 		// Stupid programmer error
 		hr = HANDLER_ERROR_PROGRAMMER;
@@ -87,6 +95,19 @@ int main(int argc, char *argv[])
 		case HANDLER_OK:
 			if(!conf.quiet || c == CM_NONE) {
 				todo_print(&td, conf.ascii_only);
+			}
+			break;
+		case HANDLER_OK_HELP:
+			if(argv[2] != NULL) {
+				Command c = parse(argv[2]);
+				bool ok = help(argv[0], c);
+				if(!ok) {
+					eprintf("Unrecognized command: %s\n\n", argv[2]);
+					return HANDLER_ERROR_USAGE;
+				}
+			} else {
+				eprintf("Manage todo lists from the command line.\n\n");
+				usage(argv[0]);
 			}
 			break;
 		case HANDLER_OK_SAVE_CHANGES:
