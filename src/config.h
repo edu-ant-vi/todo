@@ -31,9 +31,12 @@ typedef struct {
 	char filename[16];
 	bool ascii_only;
 	bool quiet;
+	bool help;
+	bool version;
 } Config;
 
-// Generate config from env variables
-void configure(Config *conf);
+// Generate config from env variables and CLI options
+// Return the index of the first non-option argument
+int configure(Config *conf, int argc, char *argv[]);
 
 #endif // TODO_CONFIG_H

@@ -22,13 +22,7 @@
 
 // A cli todo app. Because creativity was never an option.
 
-// Introducing command-line options isn't going to be as straightforward
-// as I thought it would, because it disrupts one fundamental assumption
-// of my current handlers: that they will have full access to the argv
-// array. I could give them the full array and also pass them optind, so
-// they know where to start. Or I could change the handlers in such a way
-// that they don't need to know the full argv array. The second option
-// feels more natural, so it's what I'm going to attemp at first.
+#define TODO_VERSION "pre-alpha"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,7 +51,11 @@ int main(int argc, char *argv[])
 {
 	// Configuration step
 	Config conf;
-	configure(&conf);
+	int optind = configure(&conf, argc, argv);
+	if(optind < 0) {
+		usage(argv[0]);
+		return 1;
+	}
 
 	// Setup step
 	Todo_list td;
@@ -80,13 +78,19 @@ int main(int argc, char *argv[])
 
 	// Program logic step
 	Handler_res hr;
-	Command c = parse(argv[1]);
+	Command c = parse(argv[optind]);
 	if(c >= CM_NONE && c <= CM_ERROR) {
-		hr = handler[c](&td, argc - 2, &argv[2]);
+		if(conf.help) {
+			hr = HANDLER_OK_HELP;
+		} else if(conf.version) {
+			hr = HANDLER_OK_VERSION;
+		} else {
+			hr = handler[c](&td, argc - optind - 1, &argv[optind + 1]);
+		}
 	} else {
 		// Stupid programmer error
 		hr = HANDLER_ERROR_PROGRAMMER;
-		eprintf("Unhandled command: %s\n", argv[1]);
+		eprintf("Unhandled command: %s\n", argv[optind]);
 	}
 
 	// Error handling step
@@ -98,17 +102,21 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case HANDLER_OK_HELP:
-			if(argv[2] != NULL) {
-				Command c = parse(argv[2]);
+			if(!conf.help) optind++;
+			if(optind < argc) {
+				Command c = parse(argv[optind]);
 				bool ok = help(argv[0], c);
 				if(!ok) {
-					eprintf("Unrecognized command: %s\n\n", argv[2]);
-					return HANDLER_ERROR_USAGE;
+					eprintf("Unrecognized command: %s\n", argv[optind]);
+					exit_code = 1; // usage error
 				}
 			} else {
-				eprintf("Manage todo lists from the command line.\n\n");
+				eprintf("Manage todo lists from the command line.\n");
 				usage(argv[0]);
 			}
+			break;
+		case HANDLER_OK_VERSION:
+			printf("%s\n", TODO_VERSION);
 			break;
 		case HANDLER_OK_SAVE_CHANGES:
 			todo_save(&td, todo_fd);

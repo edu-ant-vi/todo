@@ -30,7 +30,7 @@
 void usage(const char *exec)
 {
 	const char usage_text[] = 
-		"usage %s <command>\n\n"
+		"\nusage %s <command>\n\n"
 		"List of commands:\n\n"
 		"h, help       print this usage text\n"
 		"a, add        add new tasks to the todo list\n"
