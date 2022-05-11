@@ -1,30 +1,89 @@
 .TH TODO 1
+.\"
 .SH NAME
 todo \- manage todo lists from the command line
+.\"
 .SH SYNOPSIS
-.B todo
-[\fB\-\-version\fR]
-[\fB\-h|\-\-help\fR]
-[\fB\-q|\-\-quiet\fR]
-[\fB\-\-file\-name \fIfilename\fR]
-.I <command>
-.IB <args...>
+.B todo [options] [command] [<args>...]
+.\"
 .SH DESCRIPTION
+.\"
 .B todo
-is a command-line utility for creating and modifying todo lists.
+is a command-line utility for managing todo lists. Very original, I know. When executed, it searches the current
+directory for a todo list, usually saved as "TODO". It will then carry out the given command on that list. If no
+command is given, it will display the list and exit. By default, the list is also displayed after every command,
+a behavior that can be overrided with the \fBTODO_QUIET\fR environment variable.
+.PP
+Available commands:
+.TP 2
+•
+.I add
+.TP 2
+•
+.I check
+.TP 2
+•
+.I help
+.TP 2
+•
+.I rm
+.TP 2
+•
+.I uncheck
+.TP 2
+•
+.I work-on
+.PP
+All of these commands may also be called using just their first letters, for convenience.
+.\"
 .SH OPTIONS
-.TP
+.TP 2
 .B \-\-version
-Prints the version and exits.
-.TP
-.B \-h ", " \-\-help
-Displays help information.
-.TP
-.B \-q ", " \-\-quiet
-Suppress output, unless no command is given.
-.TP
-.B \-f ", " \-\-file\-name =\fIfilename\fR
+Print version number and copyright and exit.
+.\"
+.TP 2
+.B \-h, \-\-help
+If a command was given, show the usage text for it. Otherwise, show the general usage text.
+.\"
+.TP 2
+.B \-q, \-\-quiet
+Suppress output, unless no command is given or an error occurs.
+.\"
+.TP 2
+.B \-f, \-\-file\-name=\fIfilename\fR
+Change the name of the file used for saving the todo list.
+.\"
+.SH ENVIRONMENT VARIABLES
+.TP 2
+.B TODO_ASCII_ONLY
+Use only ascii characters to display the todo list.
+.TP 2
+.B TODO_FILENAME
+Change the name of the file used for saving the todo list.
+.\"
+.TP 2
+.B TODO_QUIET
+Suppress output, unless no command is given or an error occurs.
+.\"
 .SH AUTHORS
 Eduardo Antunes dos Santos Vieira <eduardoantunes986@gmail.com>
+.\"
 .SH COPYRIGHT
-Copyright Eduardo Antunes dos Santos Vieira 2022. Licensed under GNU GPL version 3.
+Copyright 2022 Eduardo Antunes dos Santos Vieira.
+.\"
+.SH LICENSING
+todo is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option)
+any later version.
+.PP
+todo is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the GNU General Public License for more
+details.
+.PP
+You should have received a copy of the GNU General
+Public License along with todo. If not, see
+<https://www.gnu.org/licenses/>.

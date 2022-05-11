@@ -117,6 +117,7 @@ int main(int argc, char *argv[])
 			break;
 		case HANDLER_OK_VERSION:
 			printf("%s\n", TODO_VERSION);
+			printf("Copyright 2022 Eduardo Antunes dos Santos Vieira\n");
 			break;
 		case HANDLER_OK_SAVE_CHANGES:
 			todo_save(&td, todo_fd);
