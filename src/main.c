@@ -1,5 +1,5 @@
 /*
-   Copyright 2022 Eduardo Antunes
+   Copyright 2022 Eduardo Antunes dos Santos Vieira
 
    This file is part of todo.
 
@@ -62,7 +62,6 @@ int main(int argc, char *argv[])
 	todo_init(&td);
 
 	FILE *todo_fd = fopen(conf.filename, "r");
-
 	if(todo_fd != NULL) {
 		// If the file exists, we read it
 		todo_read_file(&td, todo_fd);
@@ -108,6 +107,7 @@ int main(int argc, char *argv[])
 				bool ok = help(argv[0], c);
 				if(!ok) {
 					eprintf("Unrecognized command: %s\n", argv[optind]);
+					usage(argv[0]);
 					exit_code = 1; // usage error
 				}
 			} else {

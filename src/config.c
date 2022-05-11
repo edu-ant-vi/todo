@@ -1,5 +1,5 @@
 /*
-   Copyright 2022 Eduardo Antunes
+   Copyright 2022 Eduardo Antunes dos Santos Vieira
 
    This file is part of todo.
 
@@ -68,7 +68,6 @@ int configure(Config *conf, int argc, char *argv[])
     while(true) {
         opt = getopt_long(argc, argv, short_opts, long_opts, &longindex);
         if(opt == -1) break;
-
         switch(opt) {
             case 'q':
                 conf->quiet = true;
@@ -86,6 +85,5 @@ int configure(Config *conf, int argc, char *argv[])
                 return -1;
         }
     }
-
     return optind;
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright 2022 Eduardo Antunes
+    Copyright 2022 Eduardo Antunes dos Santos Vieira
 
     This file is part of todo.
 
@@ -66,6 +66,7 @@ void todo_free(Todo_list *td)
     td->tasks = NULL;
 }
 
+// TODO: behaves wrongly when the list is all holes
 // Print todo list in readable format
 void todo_print(Todo_list *td, bool ascii_only)
 {

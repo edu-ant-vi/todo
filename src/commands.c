@@ -1,5 +1,5 @@
 /*
-   Copyright 2022 Eduardo Antunes
+   Copyright 2022 Eduardo Antunes dos Santos Vieira
 
    This file is part of todo.
 
