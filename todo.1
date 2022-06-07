@@ -9,10 +9,15 @@ todo \- manage todo lists from the command line
 .SH DESCRIPTION
 .\"
 .B todo
-is a command-line utility for managing todo lists. Very original, I know. When executed, it searches the current
-directory for a todo list, usually saved as "TODO". It will then carry out the given command on that list. If no
-command is given, it will display the list and exit. By default, the list is also displayed after every command,
-a behavior that can be overrided with the \fBTODO_QUIET\fR environment variable.
+is a command-line utility for managing todo lists. It is simple and small: all it
+allows one to do is to create tasks, remove them and change their state. There are
+only three valid states: todo, done and in-progress.
+.PP
+When it is run, it checks the current directory for a TODO file, creating it if
+it does not exist. That file is used by it to record the todo list for that 
+directory. It is possible to make 
+.B todo 
+search for a different filename, as described further in this page.
 .PP
 Available commands:
 .TP 2
@@ -34,7 +39,16 @@ Available commands:
 •
 .I work-on
 .PP
-All of these commands may also be called using just their first letters, for convenience.
+All of these commands may be called by providing just their first letter. So todo
+will interpret a lonely "w" as a "work-on" command, and a "c" as a "check".
+.PP
+After carrying out the operation of a command,
+.B todo
+will print the list to stdout. Each task is printed to its own line, containing
+its state and its name. The todo state is shown as an empty box; the done state
+is shown and a box filled with a check symbol or an X; and the in-progress state 
+is shown as box filled with a dash. If no command is given, the list will also be
+printed in this fashion.
 .\"
 .SH OPTIONS
 .TP 2
@@ -64,6 +78,36 @@ Change the name of the file used for saving the todo list.
 .TP 2
 .B TODO_QUIET
 Suppress output, unless no command is given or an error occurs.
+.\"
+.SH COMMANDS
+.SS Add Command
+The add command takes a series of task names and appends them to the end of the
+todo list, marked as "todo".
+.\"
+.SS Check Command
+The check command takes a series of task indices and marks the tasks they 
+correspond to as done.
+.\"
+.SS Help Command
+The help command may take the name of a command as an argument. In this case, it
+will show the usage text for that particular command. If the given argument does
+not correspond to a command or no argument is given, then it shows the general
+usage text.
+.\"
+.SS Rm Command
+The rm command takes a series of task indices and removes the tasks they correspond
+to from the list.
+.\"
+.SS Uncheck Command
+The uncheck command takes a series of task indices and marks the tasks they 
+correspond to as todo.
+.\"
+.SS Work-on Command
+The work-on command takes a series of task indices. It marks all but the last task 
+they correspond to as done. The last one is marked as in-progress. This is due to
+the principle that there should be only one in-progress task at any given moment.
+Another consequence of it is that, if there was already an in-progress task on
+the list when this command is called, it will be marked as done.
 .\"
 .SH AUTHORS
 Eduardo Antunes dos Santos Vieira <eduardoantunes986@gmail.com>
