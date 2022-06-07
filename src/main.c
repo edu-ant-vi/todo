@@ -22,7 +22,7 @@
 
 // A cli todo app. Because creativity was never an option.
 
-#define TODO_VERSION "pre-alpha"
+#define TODO_VERSION "1.0.0"
 
 #include <stdio.h>
 #include <stdlib.h>
