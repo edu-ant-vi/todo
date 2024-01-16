@@ -28,6 +28,6 @@
 typedef unsigned uint;
 
 #define eprintf(...) \
-	fprintf(stderr, __VA_ARGS__);
+	fprintf(stderr, "[!] " __VA_ARGS__);
 
 #endif // TODO_COMMON_H

@@ -1,5 +1,5 @@
 /*
-   Copyright 2022 Eduardo Antunes dos Santos Vieira
+   Copyright 2022-2024 Eduardo Antunes dos Santos Vieira
 
    This file is part of todo.
 
@@ -22,13 +22,13 @@
 
 // A cli todo app. Because creativity was never an option.
 
-#define TODO_VERSION "1.0.0"
+#define TODO_VERSION "1.1.0"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "common.h"
 #include "todo.h"
+#include "common.h"
 #include "help.h"
 #include "handler.h"
 #include "commands.h"
@@ -42,7 +42,6 @@ Handler handler[] = {
 	[CM_CHECK]   = check_handler,
 	[CM_UNCHECK] = uncheck_handler,
 	[CM_WORK_ON] = work_on_handler,
-	[CM_ERROR]   = error_handler,
 };
 
 void todo_save(Todo_list *td, FILE *todo_fd);
@@ -51,11 +50,7 @@ int main(int argc, char *argv[])
 {
 	// Configuration step
 	Config conf;
-	int optind = configure(&conf, argc, argv);
-	if(optind < 0) {
-		usage(argv[0]);
-		return 1;
-	}
+	read_config(&conf, argc, argv);
 
 	// Setup step
 	Todo_list td;
@@ -77,19 +72,19 @@ int main(int argc, char *argv[])
 
 	// Program logic step
 	Handler_res hr;
-	Command c = parse(argv[optind]);
+	Command c = conf.comm;
 	if(c >= CM_NONE && c <= CM_ERROR) {
 		if(conf.help) {
 			hr = HANDLER_OK_HELP;
 		} else if(conf.version) {
 			hr = HANDLER_OK_VERSION;
 		} else {
-			hr = handler[c](&td, argc - optind - 1, &argv[optind + 1]);
+			hr = handler[c](&td, &argv[conf.args_ind]);
 		}
 	} else {
 		// Stupid programmer error
 		hr = HANDLER_ERROR_PROGRAMMER;
-		eprintf("Unhandled command: %s\n", argv[optind]);
+		/* eprintf("Unhandled command: %s\n", argv[optind]); */
 	}
 
 	// Error handling step
@@ -101,12 +96,12 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case HANDLER_OK_HELP:
-			if(!conf.help) optind++;
-			if(optind < argc) {
-				Command c = parse(argv[optind]);
+			/* if(!conf.help) optind++; */
+			if(conf.args_ind < argc) {
+				Command c = parse(argv[conf.args_ind]);
 				bool ok = help(argv[0], c);
 				if(!ok) {
-					eprintf("Unrecognized command: %s\n", argv[optind]);
+					eprintf("Unrecognized command: %s\n", argv[conf.args_ind]);
 					usage(argv[0]);
 					exit_code = 1; // usage error
 				}
@@ -117,7 +112,8 @@ int main(int argc, char *argv[])
 			break;
 		case HANDLER_OK_VERSION:
 			printf("%s\n", TODO_VERSION);
-			printf("Copyright 2022 Eduardo Antunes dos Santos Vieira\n");
+			printf("Copyright 2022-2024 Eduardo Antunes dos Santos Vieira\n");
+			printf("Licensed under GNU GPL v3\n");
 			break;
 		case HANDLER_OK_SAVE_CHANGES:
 			todo_save(&td, todo_fd);
@@ -134,7 +130,7 @@ int main(int argc, char *argv[])
 			break;
 		case HANDLER_ERROR_INVALID_NUMERIC_ARGS:
 			exit_code = 2;
-			eprintf("Arguments to %s must be integers\n", argv[1]);
+			eprintf("Arguments to %s must be integers\n", argv[conf.args_ind - 1]);
 			break;
 		case HANDLER_ERROR_INDEX_TOO_LOW:
 			exit_code = 3;

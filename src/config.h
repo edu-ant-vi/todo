@@ -25,18 +25,20 @@
 #ifndef TODO_CONFIG_H
 #define TODO_CONFIG_H
 
+#include "commands.h"
 #include "common.h"
 
 typedef struct {
-	char filename[16];
-	bool ascii_only;
 	bool quiet;
 	bool help;
 	bool version;
+	bool ascii_only;
+	char filename[16];
+	Command comm;
+	int args_ind;
 } Config;
 
 // Generate config from env variables and CLI options
-// Return the index of the first non-option argument
-int configure(Config *conf, int argc, char *argv[]);
+void read_config(Config *conf, int argc, char *argv[]);
 
 #endif // TODO_CONFIG_H
