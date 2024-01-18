@@ -22,6 +22,8 @@
 
 // A cli todo app. Because creativity was never an option.
 
+#include <assert.h>
+#include <string.h>
 #define TODO_VERSION "1.1.0"
 
 #include <stdio.h>
@@ -55,6 +57,7 @@ int main(int argc, char *argv[])
 	// Setup step
 	Todo_list td;
 	todo_init(&td);
+	assert(strcmp(conf.filename, "TODO") == 0);
 
 	FILE *todo_fd = fopen(conf.filename, "r");
 	if(todo_fd != NULL) {
@@ -106,7 +109,7 @@ int main(int argc, char *argv[])
 					exit_code = 1; // usage error
 				}
 			} else {
-				eprintf("Manage todo lists from the command line.\n");
+				printf("Manage todo lists from the command line.\n");
 				usage(argv[0]);
 			}
 			break;

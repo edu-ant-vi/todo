@@ -1,5 +1,5 @@
 /*
-   Copyright 2022 Eduardo Antunes dos Santos Vieira
+   Copyright 2022-2024 Eduardo Antunes dos Santos Vieira
 
    This file is part of todo.
 
@@ -21,8 +21,7 @@
 */
 
 #include <string.h>
-
-#include "common.h"
+#include <stdbool.h>
 #include "commands.h"
 
 char command[NUM_COMMANDS - 1][8] = {

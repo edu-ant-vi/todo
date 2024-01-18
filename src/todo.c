@@ -1,23 +1,23 @@
 /*
-    Copyright 2022 Eduardo Antunes dos Santos Vieira
+    Copyright 2022-2024 Eduardo Antunes dos Santos Vieira
 
     This file is part of todo.
 
     todo is free software: you can redistribute it and/or
-    modify it under the terms of the GNU General Public 
-    License as published by the Free Software Foundation, 
-    either version 3 of the License, or (at your option) 
+    modify it under the terms of the GNU General Public
+    License as published by the Free Software Foundation,
+    either version 3 of the License, or (at your option)
     any later version.
 
-    todo is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied 
+    todo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied
     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
     PURPOSE. See the GNU General Public License for more
     details.
 
-    You should have received a copy of the GNU General 
-    Public License along with todo. If not, see 
-    <https://www.gnu.org/licenses/>. 
+    You should have received a copy of the GNU General
+    Public License along with todo. If not, see
+    <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -31,6 +31,7 @@
 void todo_init(Todo_list *td)
 {
     td->count = 0;
+    td->real_count = 0;
     td->capacity = 8;
     td->tasks = (Task*) calloc(8, sizeof(Task));
 }
@@ -40,13 +41,13 @@ unsigned todo_add(Todo_list *td, Task_state ts, const char *name)
 {
     if(td->capacity < td->count + 1) {
         td->capacity *= 2;
-        td->tasks = 
-            realloc(td->tasks, td->capacity * sizeof(Task));
+        td->tasks =  realloc(td->tasks, td->capacity * sizeof(Task));
     }
     Task t;
     t.state = ts;
     strncpy(t.name, name, 256);
     td->tasks[td->count] = t;
+    ++td->real_count;
     return td->count++;
 }
 
@@ -55,34 +56,28 @@ void todo_set_state(Todo_list *td, uint task_index, Task_state ts)
 {
     if(task_index >= td->count) return;
     td->tasks[task_index].state = ts;
+    if(ts == TASK_HOLE) --td->real_count;
 }
 
 // Free todo list
 void todo_free(Todo_list *td)
 {
     free(td->tasks);
-    td->count = 0;
+    td->count = td->real_count = 0;
     td->capacity = 0;
     td->tasks = NULL;
 }
 
-// TODO: behaves wrongly when the list is all holes
 // Print todo list in readable format
 void todo_print(Todo_list *td, bool ascii_only)
 {
-    printf("\n");
-
-    if(td->count == 0) {
+    if(td->real_count == 0) {
         printf("No tasks. Rejoice!\n");
         return;
     }
-
     const char *done = ascii_only ? "X" : "✓";
 
     for(uint i = 0; i < td->count; i++) {
-        if(td->tasks[i].state == TASK_HOLE)
-            continue;
-
         printf(" %d ", i + 1);
         switch(td->tasks[i].state) {
             case TASK_TODO:
@@ -103,7 +98,6 @@ void todo_print(Todo_list *td, bool ascii_only)
         }
         printf("%s\n", td->tasks[i].name);
     }
-    printf("\n");
 }
 
 // Write todo list to file
@@ -125,7 +119,7 @@ void todo_write_file(Todo_list *td, FILE *file)
                 // delete them
                 continue;
             default:
-                fprintf(file, "?,");
+                fprintf(file, "?");
         }
         fprintf(file, "%s\n", td->tasks[i].name);
     }
@@ -138,7 +132,8 @@ void todo_read_file(Todo_list *td, FILE *file)
     Task_state ts;
     char ch, name[256];
     while(true) {
-        i = fscanf(file, "%c%[^\n]\n", &ch, name);
+        i = fscanf(file, "%c%255[^\n]\n", &ch, name);
+        name[255] = '\0';
         if(i == EOF) return;
         switch(ch) {
             case 't': ts = TASK_TODO; break;

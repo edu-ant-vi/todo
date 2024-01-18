@@ -1,5 +1,3 @@
-obj/
-todo
+build/
+.cache/
 TODO
-# Just a script I'm using to make simple tests
-reset

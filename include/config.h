@@ -1,5 +1,5 @@
 /*
-   Copyright 2022 Eduardo Antunes dos Santos Vieira
+   Copyright 2022-2024 Eduardo Antunes dos Santos Vieira
 
    This file is part of todo.
 
@@ -34,8 +34,8 @@ typedef struct {
 	bool version;
 	bool ascii_only;
 	char filename[16];
-	Command comm;
 	int args_ind;
+	Command comm;
 } Config;
 
 // Generate config from env variables and CLI options

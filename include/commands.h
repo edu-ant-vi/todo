@@ -1,5 +1,5 @@
 /*
-   Copyright 2022 Eduardo Antunes dos Santos Vieira
+   Copyright 2022-2024 Eduardo Antunes dos Santos Vieira
 
    This file is part of todo.
 
@@ -20,16 +20,26 @@
    <https://www.gnu.org/licenses/>.
 */
 
-#ifndef TODO_HELP_H
-#define TODO_HELP_H
+// This module defines the valid subcommands for todo,
+// along with a parse function to recognize them.
 
-#include "common.h"
-#include "commands.h"
+#ifndef TODO_PARSE_H
+#define TODO_PARSE_H
 
-// Print usage text for todo
-void usage(const char *name);
+typedef enum {
+    CM_NONE = 0,
+    CM_HELP,
+    CM_ADD,
+    CM_REMOVE,
+    CM_CHECK,
+    CM_UNCHECK,
+    CM_WORK_ON,
 
-// Print help for an specific command
-bool help(const char *exec, Command c);
+    CM_ERROR,
+    NUM_COMMANDS,
+} Command;
 
-#endif // TODO_HELP_H
+// Parse subcommand
+Command parse(const char *argv1);
+
+#endif // TODO_PARSE_H
